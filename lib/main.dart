@@ -1,4 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_experiment/Pager.dart';
+import 'package:flutter_experiment/navigation.dart';
 
 void main() => runApp(MyApp());
 
@@ -45,31 +50,93 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int counter = 0;
+  var pagerChild = List<Widget>();
 
-  void incrementCounter() {
+  //get color list
+  List colors = [Colors.red, Colors.green, Colors.yellow];
+  Random random = new Random();
+
+  var pageView;
+  var pageNow;
+  var tempCurPage;
+
+  PageController pageController;
+
+  PageController setPageController(counter) {
+    pageController = new PageController(
+        initialPage: counter, keepPage: true, viewportFraction: 1)..addListener(pagerListener);
+    return pageController;
+  }
+
+  void setPageNow(position) {
     setState(() {
-      counter++;
+      pageNow = position;
     });
   }
 
+  void addViewPager() {
+    setState(() {
+      counter++;
+      if(counter==1){
+        setPageNow(0);
+      }
+    });
+  }
+
+  pagerListener() {
+//    if((pageController.page%1!=0)==false){
+//      setPageNow(pageController.page.round());
+//    }
+//    print(pageController.page.round());
+
+    if((tempCurPage>pageController.page.round() || tempCurPage<pageController.page.round()) && tempCurPage!=pageController.page.round()){
+      tempCurPage = pageController.page.round();
+      setPageNow(tempCurPage);
+    }
+
+//    setPageNow(pageController.page.round());
+//    setPageNow();
+  }
+
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    tempCurPage=0;
+  }
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(24),
-            child: new Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: incrementCounter,
-                backgroundColor: Colors.blue,
-                child: Text('$counter'),
+        body: Stack(
+          children: <Widget>[
+//        pagerChild.length>0?pageView:Container(),
+            PageView.builder(
+                itemCount: counter,
+                scrollDirection: Axis.vertical,
+                controller:setPageController(counter),
+                itemBuilder: (context, position) {
+                  var positionNow = position + 1;
+                  return Pager(title: 'Posisi ke $positionNow',
+                    color: colors[position%3],
+                    curPos: position,);
+                }
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Navigation(length: counter, positionNow:pageNow),
+            ),
+            Container(
+              margin: EdgeInsets.all(24),
+              child: new Align(
+                alignment: Alignment.bottomRight,
+                child: FloatingActionButton(
+                  onPressed: addViewPager,
+                  backgroundColor: Colors.blue,
+                  child: Text('$counter'),
+                ),
               ),
             ),
-          )
-        ],
-      )
-    );
+          ],
+        ));
   }
 }
