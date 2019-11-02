@@ -17,6 +17,9 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  sliding_up_panel: ^0.3.6
+  geolocator: ^5.1.4+2
+  http: ^0.12.0+2
   flutter:
     sdk: flutter
 

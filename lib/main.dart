@@ -1,4 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:geolocator/geolocator.dart';
+
+/* Local Imported Depedency */
+import 'package:flutter_experiment/MainInfoCard.dart';
 
 void main() => runApp(MyApp());
 
@@ -7,6 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -28,15 +38,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -44,32 +45,65 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int counter = 0;
+  Placemark placemark;
 
-  void incrementCounter() {
+  void getCurrentLocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    List<Placemark> placemarkList = await Geolocator()
+        .placemarkFromCoordinates(position.latitude, position.longitude);
     setState(() {
-      counter++;
+      placemark = placemarkList[0];
     });
+  }
+
+  Widget buildMainInfoWidget() {
+    if (placemark != null) {
+      return MainInfoCard(
+        placemark: placemark,
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    getCurrentLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(24),
-            child: new Align(
-              alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: incrementCounter,
-                backgroundColor: Colors.blue,
-                child: Text('$counter'),
+        backgroundColor: Color(0xFFFFCCBC),
+        body: ScrollConfiguration(
+            behavior: MyBehavior(),
+            child: SingleChildScrollView(
+              child: new Container(
+                child: Column(
+                  children: <Widget>[
+                    //Add a card here
+                    buildMainInfoWidget(),
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
-      )
+            ))
     );
+  }
+}
+
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
+    return child;
   }
 }
