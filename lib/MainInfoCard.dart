@@ -6,6 +6,7 @@ import 'package:flutter_experiment/Statics.dart';
 import 'package:flutter_experiment/WeatherUrl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_experiment/Utils.dart' as Util;
 
 class MainInfoCard extends StatefulWidget {
   MainInfoCard({Key key, this.placemark}) : super(key: key);
@@ -66,11 +67,6 @@ class MainInfoCardState extends State<MainInfoCard> {
     }
   }
 
-  String convertFarenheitToCelcius(value) {
-    value = value - 273.15;
-    return "${value.round().toString()}\u2103";
-  }
-
   Widget currentWeatherWidget() {
     if (currentWeather == null) {
       return Container();
@@ -119,7 +115,7 @@ class MainInfoCardState extends State<MainInfoCard> {
                             child: Align(
                               alignment: Alignment.center,
                               child: Text(
-                                convertFarenheitToCelcius(
+                                Util.convertFarenheitToCelcius(
                                     currentWeather.tempMin),
                                 style: TextStyle(
                                     fontSize: 24, fontWeight: FontWeight.w300),
@@ -149,7 +145,7 @@ class MainInfoCardState extends State<MainInfoCard> {
                               child: Align(
                                 alignment: Alignment.center,
                                 child: Text(
-                                  convertFarenheitToCelcius(
+                                  Util.convertFarenheitToCelcius(
                                       currentWeather.tempMax),
                                   style: TextStyle(
                                       fontSize: 50,
@@ -182,7 +178,7 @@ class MainInfoCardState extends State<MainInfoCard> {
                             child: Align(
                               alignment: Alignment.center,
                               child: Text(
-                                convertFarenheitToCelcius(
+                                Util.convertFarenheitToCelcius(
                                     currentWeather.tempMax),
                                 style: TextStyle(
                                     fontSize: 24, fontWeight: FontWeight.w300),
